@@ -12,7 +12,16 @@ code {
     monospace;
 }
 
-html, body{
-  margin: 0;
-  padding: 0;
+.name{
+  text-align: center;
+  background-color: #85A98F;
+  text-decoration: underline;
+  margin: 0px;
+  padding: 15px;
+  color: black;
+}
+
+.resetbtn{
+  text-align: center;
+  background-color: #85A98F;
 }

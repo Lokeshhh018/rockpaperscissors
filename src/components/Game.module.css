@@ -1,12 +1,12 @@
 .container{
-    background-color: black;
+    background-color: #85A98F;
     text-align: center;
     color: white;
     margin: 0;
     padding: 0;
-    height: 100vh;
     width: 100vw;
 }
+
 
 .p{
     background-color: white;
@@ -15,6 +15,51 @@
 
 .heading{
     text-align: center;
-    margin: 0;
-    padding: 0;
-    }
+    margin: 10px;
+    padding: 25px;
+    text-decoration: underline;
+    color: black;
+ }
+
+.result{
+    text-align: center;
+ }
+.btn{
+    text-align: center;
+}
+
+.options{
+    background-color: orange;
+    color: black;
+    font-size: 20px;
+    font-weight: 1000;
+    margin: 10px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    transition: background-color 10 ease;
+}
+.options:hover{
+    background-color: green;
+    color: rgb(255, 255, 255);
+}
+
+.resetbtn{
+    text-align: center;
+    color: white;
+    background-color: black;
+    margin: 0px;
+    padding: 5px;
+    border-radius: 0px;
+  }
+.resetbtn:hover{
+    background-color: white;
+    color: black;
+}
+
+.thanks{
+    text-align: center;
+    justify-content: center;
+    font-size: 75px;
+    font-weight: 1000;
+}
