@@ -1,74 +1,163 @@
-import styles from './Game.module.css'
-import { FaHandRock } from "react-icons/fa";
-import { FaHandPaper } from "react-icons/fa";
-import { FaHandScissors } from "react-icons/fa";
-import {useState} from "react";
+import styles from './Game.module.css';
+import { FaHandRock, FaHandPaper, FaHandScissors } from "react-icons/fa";
+import { useState } from "react";
+import { motion } from "framer-motion";
 
+function Game() {
+    const [playerChoice, setPlayerChoice] = useState(null);
+    const [computerChoice, setComputerChoice] = useState(null);
+    const [playerScore, setPlayerScore] = useState(0);
+    const [compScore, setCompScore] = useState(0);
+    const [resultMessage, setResultMessage] = useState("");
+    const [winningScore, setWinningScore] = useState(3);
+    const [gameOver, setGameOver] = useState(false);
 
-function Game(){
-    const[playerChoice, setPlayerChoice]= useState(null)
-    const[computerChoice, setComputerChoice]= useState(null)
-    const[playerScore, setPlayerScore]= useState(0)
-    const[compScore, setCompScore]= useState(0)
+    const choices = ["Rock", "Paper", "Scissors"];
 
     const gameLogic = (playerChoice, computerChoice) => {
-        if(playerChoice === computerChoice) return 0;
-        else if((playerChoice === "Rock" && computerChoice === "Scissors") || (playerChoice === "Scissors" && computerChoice === "Paper") || (playerChoice === "Paper" && computerChoice === "Rock")) return 1;
-        else return -1;
-    }
+        if (playerChoice === computerChoice) return "It's a Draw!";
+        if (
+            (playerChoice === "Rock" && computerChoice === "Scissors") ||
+            (playerChoice === "Scissors" && computerChoice === "Paper") ||
+            (playerChoice === "Paper" && computerChoice === "Rock")
+        ) {
+            return "You Win!";
+        }
+        return "Computer Wins!";
+    };
 
     const gameDecision = (playerChoice) => {
-        const choices = ["Rock", "Paper", "Scissors"]
-        const computerChoice = choices[Math.floor(Math.random()*choices.length)]
-        const val=gameLogic(playerChoice, computerChoice)
+        if (gameOver) return;
 
-        setPlayerChoice(playerChoice)
-        setComputerChoice(computerChoice)
+        const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+        setPlayerChoice(playerChoice);
+        setComputerChoice(computerChoice);
 
-        if(val === 1){
-            setPlayerScore(playerScore + 1)
+        const result = gameLogic(playerChoice, computerChoice);
+        setResultMessage(result);
+
+        if (result === "You Win!") {
+            setPlayerScore((prev) => {
+                const newScore = prev + 1;
+                if (newScore >= winningScore) {
+                    setGameOver(true);
+                    setResultMessage("You Win the Game!");
+                }
+                return newScore;
+            });
+        } else if (result === "Computer Wins!") {
+            setCompScore((prev) => {
+                const newScore = prev + 1;
+                if (newScore >= winningScore) {
+                    setGameOver(true);
+                    setResultMessage("Computer Wins the Game!");
+                }
+                return newScore;
+            });
         }
-        else if(val === -1)
-            setCompScore(compScore + 1)
-    }
+    };
 
-
-    const resetGame= () => {
-        setPlayerChoice(null)
-        setComputerChoice(null)
-        setCompScore(0)
-        setPlayerScore(0)
-    }
+    const resetGame = () => {
+        setPlayerChoice(null);
+        setComputerChoice(null);
+        setCompScore(0);
+        setPlayerScore(0);
+        setResultMessage("");
+        setGameOver(false);
+    };
 
     return (
-        <>
-        <div className= {styles.container}>
-            <h1 className= {styles.heading}> Welcome to the Rock Paper Scissors Game</h1>
-        </div>
+        <div className={styles.container}>
+            <h1 className={styles.heading}>Rock Paper Scissors</h1>
 
-        <div className={styles.btn}>
-                <button className={styles.options} onClick= {() => gameDecision("Rock")}><FaHandRock/>  Rock</button>
-                <button className={styles.options} onClick= {() => gameDecision("Paper")}><FaHandPaper/>  Paper</button>
-                <button className={styles.options} onClick= {() => gameDecision("Scissors")}><FaHandScissors />  Scissors</button>
-        </div>
+            {/* Winning Score Input */}
+            <div className={styles.scoreInput}>
+                <label>Winning Score: </label>
+                <input 
+                    type="number" 
+                    value={winningScore} 
+                    onChange={(e) => setWinningScore(Number(e.target.value) || 3)}
+                    min="1"
+                    disabled={playerScore > 0 || compScore > 0}
+                />
+            </div>
 
-        <div className= {styles.result}>
-            <p><li> Your choice : {playerChoice}</li></p>
-            <p><li> Computer's Choice : {computerChoice}</li></p>
-            <p><li> your score : {playerScore}</li></p>
-            <p><li>computer score : {compScore}</li></p>
-        </div>
-        <div className="resetbtn">
-            <button className={styles.resetbtn} onClick= {resetGame}>reset</button>
-        </div>
+            {/* Game Controls */}
+            <div className={styles.btn}>
+                {choices.map((choice, index) => {
+                    const icons = { Rock: <FaHandRock />, Paper: <FaHandPaper />, Scissors: <FaHandScissors /> };
+                    return (
+                        <motion.button
+                            key={index}
+                            className={styles.options}
+                            onClick={() => gameDecision(choice)}
+                            disabled={gameOver}
+                            whileHover={{ scale: 1.2 }}
+                            whileTap={{ scale: 0.9 }}
+                        >
+                            {icons[choice]} {choice}
+                        </motion.button>
+                    );
+                })}
+            </div>
 
-        <div>
-            <h1>
-                <p className={styles.thanks}>THANK YOU FOR PLAYING!!!</p>
-            </h1>
-        </div>
-        </>
-    )
-} 
+            {/* Display Results with Animation */}
+            <div className={styles.result}>
+                <p>Your choice:</p>
+                {playerChoice && (
+                    <motion.div
+                        className={styles.choiceIcon}
+                        animate={{ x: [0, 10, -10, 10, -10, 10, -10, 10, 0] }}
+                        transition={{ duration: 1.0 }}
+                    >
+                        {playerChoice === "Rock" ? <FaHandRock size={50} /> :
+                         playerChoice === "Paper" ? <FaHandPaper size={50} /> :
+                         <FaHandScissors size={50} />}
+                    </motion.div>
+                )}
 
-export default Game
+                <p>Computer's choice:</p>
+                {computerChoice && (
+                    <motion.div
+                        className={styles.choiceIcon}
+                        animate={{ x: [0, 10, -10, 10, -10, 10, -10, 10, 0] }}
+                        transition={{ duration: 1.0 }}
+                    >
+                        {computerChoice === "Rock" ? <FaHandRock size={50} /> :
+                         computerChoice === "Paper" ? <FaHandPaper size={50} /> :
+                         <FaHandScissors size={50} />}
+                    </motion.div>
+                )}
+
+                <h2 className={styles.message}>{resultMessage}</h2>
+                <p>Player Score: <strong>{playerScore}</strong></p>
+                <p>Computer Score: <strong>{compScore}</strong></p>
+            </div>
+
+            {/* Reset or Play Again Button */}
+            {gameOver ? (
+                <motion.button
+                    className={styles.resetbtn}
+                    onClick={resetGame}
+                    whileHover={{ scale: 1.1 }}
+                >
+                    Play Again
+                </motion.button>
+            ) : (
+                <motion.button
+                    className={styles.resetbtn}
+                    onClick={resetGame}
+                    whileHover={{ scale: 1.1 }}
+                >
+                    Reset Game
+                </motion.button>
+            )}
+
+            <p className={styles.thanks}>THANK YOU FOR PLAYING!!!</p>
+        </div>
+    );
+}
+
+export default Game;
+
+
